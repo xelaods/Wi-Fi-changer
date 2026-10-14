@@ -51,7 +51,11 @@ struct SmallSwitchView: View {
                 } else {
                     Circle().fill(Color.secondary.opacity(0.25))
                         .frame(width: 40, height: 40)
-                        .overlay { Image(systemName: "wifi.slash").font(.system(size: 18, weight: .semibold)).foregroundStyle(.secondary) }
+                        .overlay {
+                            Image(systemName: s.otherSSID == nil ? "wifi.slash" : "wifi")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundStyle(.secondary)
+                        }
                 }
                 Spacer()
                 Image(systemName: "wifi")
@@ -59,10 +63,10 @@ struct SmallSwitchView: View {
                     .foregroundStyle(.secondary)
             }
             Spacer(minLength: 4)
-            Text(s.current == nil ? "未接続" : "接続中")
+            Text(s.connectedName == nil ? "未接続" : "接続中")
                 .font(.caption.weight(.medium))
                 .foregroundStyle(.secondary)
-            Text(s.current?.displayName ?? "Wi-Fi")
+            Text(s.connectedName ?? "Wi-Fi")
                 .font(.title3.weight(.semibold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
@@ -149,9 +153,9 @@ struct CircularSwitchView: View {
         ZStack {
             AccessoryWidgetBackground()
             VStack(spacing: 1) {
-                Image(systemName: s.current?.symbol ?? "wifi")
+                Image(systemName: s.current?.symbol ?? (s.otherSSID == nil ? "wifi.slash" : "wifi"))
                     .font(.system(size: 20, weight: .semibold))
-                Text(s.current?.displayName ?? "Wi-Fi")
+                Text(s.connectedName ?? "未接続")
                     .font(.system(size: 10, weight: .semibold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
@@ -169,7 +173,7 @@ struct RectangularSwitchView: View {
             Label("Wi-Fi", systemImage: "wifi")
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(.secondary)
-            Text(s.current?.displayName ?? "未接続")
+            Text(s.connectedName ?? "未接続")
                 .font(.headline)
                 .lineLimit(1)
                 .widgetAccentable()
@@ -187,7 +191,7 @@ struct InlineSwitchView: View {
     let s: WidgetSnapshot
 
     var body: some View {
-        Label(s.current?.displayName ?? "Wi-Fi 未接続", systemImage: "wifi")
+        Label(s.connectedName ?? "Wi-Fi 未接続", systemImage: s.connectedName == nil ? "wifi.slash" : "wifi")
     }
 }
 

@@ -5,11 +5,13 @@ import EventKit
 struct AppData: Codable, Equatable {
     var networks: [WiFiNetwork] = [.empty("a"), .empty("b")]
     var currentID: String?
+    /// 登録していないWi-Fiに接続しているときのSSID
+    var otherSSID: String?
     /// ウィジェットから切り替えたあと、ホーム画面に戻る
     var returnHome: Bool = true
 
     var snapshot: WidgetSnapshot {
-        WidgetSnapshot(networks: networks, currentID: currentID, updated: Date())
+        WidgetSnapshot(networks: networks, currentID: currentID, updated: Date(), otherSSID: otherSSID)
     }
 }
 

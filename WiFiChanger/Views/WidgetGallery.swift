@@ -10,7 +10,7 @@ struct WidgetGallery: View {
             VStack(spacing: 24) {
                 HStack(spacing: 20) {
                     frame(170, 170) { SmallSwitchView(s: s) }
-                    frame(170, 170) { SmallSwitchView(s: WidgetSnapshot(networks: s.networks, currentID: nil, updated: Date())) }
+                    frame(170, 170) { SmallSwitchView(s: WidgetSnapshot(networks: s.networks, currentID: nil, updated: Date(), otherSSID: "Starbucks_Wi2")) }
                 }
                 frame(364, 170) { MediumSwitchView(s: s) }
                 HStack(spacing: 20) {

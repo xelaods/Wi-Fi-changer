@@ -83,6 +83,23 @@ struct WidgetSnapshot: Codable, Equatable {
 
     var configured: [WiFiNetwork] { networks.filter(\.isConfigured) }
 
+    /// 登録していないWi-Fiに接続しているときのSSID
+    var otherSSID: String? = nil
+
+    /// いま接続しているWi-Fiの表示名（登録したものなら付けた名前、それ以外はSSID）
+    var connectedName: String? { current?.displayName ?? otherSSID }
+
+    /// 実際の接続先（SSID）を当てはめる。nil はWi-Fiにつながっていない
+    mutating func apply(liveSSID ssid: String?) {
+        if let ssid, let n = configured.first(where: { $0.ssid == ssid }) {
+            currentID = n.id
+            otherSSID = nil
+        } else {
+            currentID = nil
+            otherSSID = ssid
+        }
+    }
+
     /// タップしたときに切り替わる先
     var next: WiFiNetwork? {
         let list = configured

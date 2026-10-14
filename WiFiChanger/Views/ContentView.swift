@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject private var store: Store
     @State private var editing: WiFiNetwork?
+    @StateObject private var location = LocationAuth()
 
     var body: some View {
         NavigationStack {
@@ -65,6 +66,24 @@ struct ContentView: View {
                 } footer: {
                     Text(widgetFooter)
                 }
+
+                Section {
+                    if location.authorized && location.precise {
+                        HStack {
+                            Text("Wi-Fi名の表示")
+                            Spacer()
+                            Text("オン").foregroundStyle(.secondary)
+                        }
+                    } else if location.authorized {
+                        Button("「正確な位置情報」をオンにする") { location.request() }
+                    } else {
+                        Button("位置情報を許可") { location.request() }
+                    }
+                } header: {
+                    Text("接続中のWi-Fi")
+                } footer: {
+                    Text("iOSではWi-Fiの名前を読むのに位置情報の許可（正確な位置情報）が必要です。許可すると、コントロールセンターなどで切り替えたときや、登録していないWi-Fiにつながったときも、その名前をウィジェットに表示します。位置そのものは使いません。ウィジェットの更新は数分〜十数分遅れることがあります。")
+                }
             }
             .navigationTitle("Wi-Fi Changer")
             .navigationBarTitleDisplayMode(.inline)
@@ -87,6 +106,7 @@ struct ContentView: View {
                 store.persist()
             }
             .onAppear {
+                location.onChange = { Task { await store.refresh() } }
                 if ProcessInfo.processInfo.arguments.contains("-edit") {
                     editing = store.network("a")
                 }

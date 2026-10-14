@@ -48,6 +48,7 @@ targets:
         ITSAppUsesNonExemptEncryption: false
         NSCalendarsFullAccessUsageDescription: ウィジェットに登録したWi-Fiの名前を表示するため、カレンダーの2001年1月4日に設定のメモを1件だけ保存します。ほかの予定を読んだり書き換えたりはしません。
         NSCalendarsUsageDescription: ウィジェットに登録したWi-Fiの名前を表示するため、カレンダーに設定のメモを1件だけ保存します。
+        NSLocationWhenInUseUsageDescription: いま接続しているWi-Fiの名前を読み取るために使います（iOSではWi-Fi名の取得に位置情報の許可が必要です）。位置そのものは使いません。
         CFBundleURLTypes:
           - CFBundleURLName: app.wifichanger.open
             CFBundleURLSchemes:
@@ -61,6 +62,8 @@ targets:
         excludes:
           - "**/*.entitlements"
       - path: Shared
+    dependencies:
+      - sdk: NetworkExtension.framework
     configFiles:
       Debug: Config/Widget.xcconfig
       Release: Config/Widget.xcconfig
@@ -80,6 +83,8 @@ targets:
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         AppGroupID: $(APP_GROUP_ID)
+        NSWidgetUsesLocation: true
+        NSLocationWhenInUseUsageDescription: いま接続しているWi-Fiの名前を読み取るために使います。
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
         NSCalendarsFullAccessUsageDescription: アプリが保存したWi-Fiの設定メモを読み込んで表示します。

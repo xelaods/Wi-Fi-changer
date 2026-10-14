@@ -1,5 +1,6 @@
 import WidgetKit
 import SwiftUI
+import CoreLocation
 
 struct SwitchEntry: TimelineEntry {
     let date: Date
@@ -17,9 +18,24 @@ struct SwitchProvider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<SwitchEntry>) -> Void) {
-        let entry = SwitchEntry(date: Date(), snapshot: SharedStore.loadSnapshot())
-        // 切り替えるたびにアプリから更新する。念のため1時間ごとにも読み直す
-        completion(Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(3600))))
+        let stored = SharedStore.loadSnapshot()
+        let authorized = CLLocationManager().isAuthorizedForWidgetUpdates || LiveWiFi.appAuthorized
+        // いま接続しているWi-Fiをウィジェット自身で読む（読めないときはアプリが記録した接続先）
+        LiveWiFi.read(authorized: authorized) { result in
+            var snapshot = stored
+            switch result {
+            case .connected(let ssid):
+                snapshot?.apply(liveSSID: ssid)
+            case .notConnected:
+                snapshot?.apply(liveSSID: nil)
+            case .unknown:
+                break
+            }
+            let entry = SwitchEntry(date: Date(), snapshot: snapshot)
+            // 読めるときは15分ごと（実際の間隔は iOS が決める）、読めないときは1時間ごと
+            let interval: TimeInterval = (result == .unknown) ? 3600 : 15 * 60
+            completion(Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(interval))))
+        }
     }
 }
 

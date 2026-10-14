@@ -88,9 +88,19 @@ final class Store: ObservableObject {
     func refresh() async {
         calendarAccess = CalendarBridge.hasAccess
         guard !demo else { return }
-        if let ssid = await WiFiSwitcher.currentSSID() {
+        switch await LiveWiFi.read(authorized: LiveWiFi.appAuthorized) {
+        case .connected(let ssid):
             liveSSID = ssid
-            data.currentID = data.networks.first { $0.isConfigured && $0.ssid == ssid }?.id
+            var s = data.snapshot
+            s.apply(liveSSID: ssid)
+            data.currentID = s.currentID
+            data.otherSSID = s.otherSSID
+        case .notConnected:
+            liveSSID = nil
+            data.currentID = nil
+            data.otherSSID = nil
+        case .unknown:
+            break
         }
         persist()
     }
@@ -110,6 +120,7 @@ final class Store: ObservableObject {
         if demo {
             try? await Task.sleep(for: .seconds(1))
             data.currentID = id
+            data.otherSSID = nil
             return
         }
 
@@ -125,6 +136,7 @@ final class Store: ObservableObject {
         }
 
         data.currentID = id
+        data.otherSSID = nil
         persist()
 
         // 実際につながるまで少し待って確かめる
@@ -137,7 +149,10 @@ final class Store: ObservableObject {
         if let joined { liveSSID = joined }
 
         if let joined, joined != n.ssid {
-            data.currentID = data.networks.first { $0.isConfigured && $0.ssid == joined }?.id
+            var snap = data.snapshot
+            snap.apply(liveSSID: joined)
+            data.currentID = snap.currentID
+            data.otherSSID = snap.otherSSID
             persist()
             UINotificationFeedbackGenerator().notificationOccurred(.error)
             show(.notJoined(n.ssid))

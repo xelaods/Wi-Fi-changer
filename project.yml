@@ -1,0 +1,92 @@
+name: WiFiChanger
+
+options:
+  bundleIdPrefix: app.wifichanger
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_LANGUAGE: ja
+
+targets:
+  WiFiChanger:
+    type: application
+    platform: iOS
+    sources:
+      - path: WiFiChanger
+        excludes:
+          - "**/*.entitlements"
+      - path: Shared
+    dependencies:
+      - target: WiFiChangerWidget
+      - sdk: NetworkExtension.framework
+    configFiles:
+      Debug: Config/App.xcconfig
+      Release: Config/App.xcconfig
+    settings:
+      base:
+        CODE_SIGN_ENTITLEMENTS: WiFiChanger/WiFiChanger.entitlements
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+    info:
+      path: WiFiChanger/Info.plist
+      properties:
+        CFBundleDisplayName: Wi-Fi Changer
+        CFBundleDevelopmentRegion: ja
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        AppGroupID: $(APP_GROUP_ID)
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        ITSAppUsesNonExemptEncryption: false
+        NSCalendarsFullAccessUsageDescription: ウィジェットに登録したWi-Fiの名前を表示するため、カレンダーの2001年1月4日に設定のメモを1件だけ保存します。ほかの予定を読んだり書き換えたりはしません。
+        NSCalendarsUsageDescription: ウィジェットに登録したWi-Fiの名前を表示するため、カレンダーに設定のメモを1件だけ保存します。
+        CFBundleURLTypes:
+          - CFBundleURLName: app.wifichanger.open
+            CFBundleURLSchemes:
+              - wifichanger
+
+  WiFiChangerWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: WiFiChangerWidget
+        excludes:
+          - "**/*.entitlements"
+      - path: Shared
+    configFiles:
+      Debug: Config/Widget.xcconfig
+      Release: Config/Widget.xcconfig
+    settings:
+      base:
+        CODE_SIGN_ENTITLEMENTS: WiFiChangerWidget/WiFiChangerWidget.entitlements
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME: WidgetBackground
+        SKIP_INSTALL: YES
+        APPLICATION_EXTENSION_API_ONLY: YES
+    info:
+      path: WiFiChangerWidget/Info.plist
+      properties:
+        CFBundleDisplayName: Wi-Fi Changer
+        CFBundleDevelopmentRegion: ja
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        AppGroupID: $(APP_GROUP_ID)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+        NSCalendarsFullAccessUsageDescription: アプリが保存したWi-Fiの設定メモを読み込んで表示します。
+
+schemes:
+  WiFiChanger:
+    build:
+      targets:
+        WiFiChanger: all
+        WiFiChangerWidget: all
